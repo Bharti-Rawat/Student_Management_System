@@ -35,13 +35,26 @@ jobs:
           emcc --version
           echo "EMSDK_ENV=$PWD/emsdk_env.sh" >> "$GITHUB_ENV"
 
-      - name: Compile original C program to WebAssembly
+      - name: Compile original C program to browser WebAssembly
         shell: bash
         run: |
           source "$EMSDK_ENV"
           mkdir -p dist
-          emcc student_management.c -O2 -o dist/student_management.html --shell-file web_shell.html -sEXIT_RUNTIME=1
+          emcc student_management.c -O2 -o dist/student_management.html \
+            --shell-file web_shell.html \
+            -sENVIRONMENT=web \
+            -sALLOW_MEMORY_GROWTH=1 \
+            -sEXIT_RUNTIME=0
           mv dist/student_management.html dist/index.html
+
+      - name: Verify generated web files
+        shell: bash
+        run: |
+          test -f dist/index.html
+          test -f dist/student_management.wasm
+          test -f dist/student_management.js
+          grep -q "STUDENT MANAGEMENT SYSTEM" dist/index.html
+          ls -lh dist
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
