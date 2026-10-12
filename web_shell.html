@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Student Management System - C</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#0b1020;color:#e5e7eb;font-family:Consolas,"Courier New",monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}.wrap{width:min(1000px,100%)}h1{font-family:Arial,sans-serif;color:#fff;font-size:28px;margin:0 0 8px}.sub{font-family:Arial,sans-serif;color:#9ca3af;margin-bottom:18px}.terminal{background:#05070d;border:1px solid #26324a;border-radius:14px;box-shadow:0 20px 60px #0008;overflow:hidden}.bar{height:42px;background:#111827;display:flex;align-items:center;padding:0 14px;gap:7px}.dot{width:11px;height:11px;border-radius:50%;background:#6b7280}.screen{padding:22px;min-height:520px;white-space:pre-wrap;line-height:1.5;overflow:auto}.status{font-family:Arial,sans-serif;margin-top:12px;color:#9ca3af;font-size:13px}.status b{color:#86efac}.hidden{display:none}canvas{display:none}</style>
+  <script>
+    var Module = {
+      print: function(text) { document.getElementById('output').textContent += text + '\n'; scrollTerminal(); },
+      printErr: function(text) { document.getElementById('output').textContent += text + '\n'; scrollTerminal(); },
+      onRuntimeInitialized: function() { document.getElementById('status').innerHTML = '<b>Running original C program in the browser.</b> Input prompts will appear when the C program asks for input.'; }
+    };
+    function scrollTerminal(){var e=document.getElementById('output');e.parentElement.scrollTop=e.parentElement.scrollHeight;}
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <h1>Student Management System</h1>
+  <div class="sub">Original C program compiled to WebAssembly — no JavaScript reimplementation of the project logic.</div>
+  <div class="terminal">
+    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+    <div class="screen"><div id="output">Loading C program...\n</div></div>
+  </div>
+  <div class="status" id="status">Starting compiled C program...</div>
+</div>
+<script>
+{{{ SCRIPT }}}
+</script>
+</body>
+</html>
