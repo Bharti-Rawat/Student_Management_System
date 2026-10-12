@@ -35,7 +35,7 @@ jobs:
           emcc --version
           echo "EMSDK_ENV=$PWD/emsdk_env.sh" >> "$GITHUB_ENV"
 
-      - name: Compile C program for browser
+      - name: Compile original C program for browser
         shell: bash
         run: |
           source "$EMSDK_ENV"
@@ -44,8 +44,8 @@ jobs:
             --shell-file web_shell.html \
             -sENVIRONMENT=web \
             -sALLOW_MEMORY_GROWTH=1 \
-            -sINVOKE_RUN=0 \
-            -sEXPORTED_RUNTIME_METHODS='["ccall"]'
+            -sEXPORTED_RUNTIME_METHODS='["ccall","UTF8ToString"]' \
+            -sEXIT_RUNTIME=0
           mv dist/student_management.html dist/index.html
 
       - name: Verify generated web files
@@ -55,6 +55,7 @@ jobs:
           test -f dist/student_management.wasm
           test -f dist/student_management.js
           grep -q "Student Management System" dist/index.html
+          grep -q "web_add_student" dist/student_management.js
           ls -lh dist
 
       - name: Setup Pages
