@@ -1,32 +1,28 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Student Management System - C</title>
-  <style>
-    *{box-sizing:border-box}body{margin:0;background:#0b1020;color:#e5e7eb;font-family:Consolas,"Courier New",monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}.wrap{width:min(1000px,100%)}h1{font-family:Arial,sans-serif;color:#fff;font-size:28px;margin:0 0 8px}.sub{font-family:Arial,sans-serif;color:#9ca3af;margin-bottom:18px}.terminal{background:#05070d;border:1px solid #26324a;border-radius:14px;box-shadow:0 20px 60px #0008;overflow:hidden}.bar{height:42px;background:#111827;display:flex;align-items:center;padding:0 14px;gap:7px}.dot{width:11px;height:11px;border-radius:50%;background:#6b7280}.screen{padding:22px;min-height:520px;white-space:pre-wrap;line-height:1.5;overflow:auto}.status{font-family:Arial,sans-serif;margin-top:12px;color:#9ca3af;font-size:13px}.status b{color:#86efac}.hidden{display:none}canvas{display:none}</style>
-  <script>
-    var Module = {
-      print: function(text) { document.getElementById('output').textContent += text + '\n'; scrollTerminal(); },
-      printErr: function(text) { document.getElementById('output').textContent += text + '\n'; scrollTerminal(); },
-      onRuntimeInitialized: function() { document.getElementById('status').innerHTML = '<b>Running original C program in the browser.</b> Input prompts will appear when the C program asks for input.'; }
-    };
-    function scrollTerminal(){var e=document.getElementById('output');e.parentElement.scrollTop=e.parentElement.scrollHeight;}
-  </script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Student Management System</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#0b1020;color:#e5e7eb;font-family:Arial,sans-serif;padding:25px}.wrap{max-width:1000px;margin:auto}h1{margin:0 0 5px;font-size:30px}.sub{color:#9ca3af;margin-bottom:20px}.panel{background:#111827;border:1px solid #334155;border-radius:14px;padding:20px}.buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}button{padding:12px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer}button:hover{background:#1d4ed8}.form{display:none;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}.form.show{display:grid}input{width:100%;padding:11px;border-radius:7px;border:1px solid #475569;background:#0f172a;color:#fff}.full{grid-column:1/-1}.output{background:#020617;border:1px solid #334155;border-radius:10px;padding:18px;min-height:280px;white-space:pre-wrap;font-family:Consolas,monospace;overflow:auto}.count{color:#86efac;margin-top:10px}@media(max-width:650px){.buttons{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}}</style>
+<script>var Module={noInitialRun:true,onRuntimeInitialized:function(){window.cReady=true;document.getElementById('output').textContent='C program loaded successfully. Choose an option above.';document.getElementById('status').textContent='Connected to compiled C program.';}};</script>
 </head>
-<body>
-<div class="wrap">
-  <h1>Student Management System</h1>
-  <div class="sub">Original C program compiled to WebAssembly — no JavaScript reimplementation of the project logic.</div>
-  <div class="terminal">
-    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-    <div class="screen"><div id="output">Loading C program...\n</div></div>
-  </div>
-  <div class="status" id="status">Starting compiled C program...</div>
-</div>
+<body><div class="wrap"><h1>Student Management System</h1><div class="sub">Original C program running through WebAssembly. JavaScript is used only for the browser interface.</div><div class="panel">
+<div class="buttons"><button onclick="showForm('add')">1. Add Student</button><button onclick="displayStudents()">2. Display Students</button><button onclick="showForm('search')">3. Search Student</button><button onclick="showForm('update')">4. Update Student</button><button onclick="showForm('delete')">5. Delete Student</button><button onclick="exitApp()">6. Exit</button></div>
+<div id="add" class="form"><input id="addRoll" type="number" placeholder="Roll Number"><input id="addName" placeholder="Name"><input id="addCourse" placeholder="Course"><input id="addMarks" type="number" step="0.01" min="0" max="100" placeholder="Marks (0-100)"><button class="full" onclick="addStudent()">Add Student</button></div>
+<div id="search" class="form"><input id="searchRoll" type="number" placeholder="Roll Number"><button onclick="searchStudent()">Search</button></div>
+<div id="update" class="form"><input id="updateRoll" type="number" placeholder="Roll Number"><input id="updateName" placeholder="New Name"><input id="updateCourse" placeholder="New Course"><input id="updateMarks" type="number" step="0.01" min="0" max="100" placeholder="New Marks"><button class="full" onclick="updateStudent()">Update Student</button></div>
+<div id="delete" class="form"><input id="deleteRoll" type="number" placeholder="Roll Number"><button onclick="deleteStudent()">Delete Student</button></div>
+<pre id="output" class="output">Loading C program...</pre><div id="status" class="count">Starting...</div>
+</div></div>
 <script>
-{{{ SCRIPT }}}
+function ready(){if(!window.cReady){document.getElementById('output').textContent='C program is still loading. Please wait...';return false}return true}function ptrString(p){return p?UTF8ToString(p):''}function hideForms(){document.querySelectorAll('.form').forEach(x=>x.classList.remove('show'))}function showForm(id){if(!ready())return;hideForms();document.getElementById(id).classList.add('show')}
+function msg(){return ptrString(Module.ccall('web_get_message','number',[],[]))}
+function total(){document.getElementById('status').textContent='Total students: '+Module.ccall('web_get_count','number',[],[])}
+function addStudent(){if(!ready())return;var ok=Module.ccall('web_add_student','number',['number','string','string','number'],[+addRoll.value,addName.value,addCourse.value,+addMarks.value]);output.textContent=msg();total();if(ok)hideForms()}
+function displayStudents(){if(!ready())return;hideForms();output.textContent=ptrString(Module.ccall('web_display_students','number',[],[]));total()}
+function searchStudent(){if(!ready())return;output.textContent=ptrString(Module.ccall('web_search_student','number',['number'],[+searchRoll.value]))}
+function updateStudent(){if(!ready())return;var ok=Module.ccall('web_update_student','number',['number','string','string','number'],[+updateRoll.value,updateName.value,updateCourse.value,+updateMarks.value]);output.textContent=msg();if(ok)hideForms()}
+function deleteStudent(){if(!ready())return;var ok=Module.ccall('web_delete_student','number',['number'],[+deleteRoll.value]);output.textContent=msg();total();if(ok)hideForms()}
+function exitApp(){if(!ready())return;hideForms();output.textContent='Thank you for using Student Management System!';document.getElementById('status').textContent='Program session ended.'}
 </script>
-</body>
-</html>
+{{{ SCRIPT }}}
+</body></html>
