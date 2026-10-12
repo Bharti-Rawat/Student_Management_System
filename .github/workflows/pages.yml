@@ -40,7 +40,8 @@ jobs:
         run: |
           source "$EMSDK_ENV"
           mkdir -p dist
-          emcc student_management.c -O2 -o dist/index.html -sEXIT_RUNTIME=1
+          emcc student_management.c -O2 -o dist/student_management.html --shell-file web_shell.html -sEXIT_RUNTIME=1
+          mv dist/student_management.html dist/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
