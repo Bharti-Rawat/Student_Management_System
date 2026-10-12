@@ -1,27 +1,48 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX 100
+#define MAX_STUDENTS 100
+#define NAME_SIZE 50
+#define COURSE_SIZE 30
 
 typedef struct {
     int rollNo;
-    char name[50];
-    char course[30];
+    char name[NAME_SIZE];
+    char course[COURSE_SIZE];
     float marks;
 } Student;
 
-Student students[MAX];
+Student students[MAX_STUDENTS];
 int count = 0;
 
-void addStudent() {
-    if (count >= MAX) {
+int findStudent(int rollNo) {
+    int i;
+    for (i = 0; i < count; i++) {
+        if (students[i].rollNo == rollNo) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void addStudent(void) {
+    int rollNo;
+
+    if (count >= MAX_STUDENTS) {
         printf("\nStudent record limit reached!\n");
         return;
     }
 
     printf("\n--- Add Student ---\n");
     printf("Enter Roll Number: ");
-    scanf("%d", &students[count].rollNo);
+    scanf("%d", &rollNo);
+
+    if (findStudent(rollNo) != -1) {
+        printf("Student with this Roll Number already exists!\n");
+        return;
+    }
+
+    students[count].rollNo = rollNo;
 
     printf("Enter Name: ");
     scanf(" %49[^\n]", students[count].name);
@@ -29,14 +50,19 @@ void addStudent() {
     printf("Enter Course: ");
     scanf(" %29[^\n]", students[count].course);
 
-    printf("Enter Marks: ");
+    printf("Enter Marks (0-100): ");
     scanf("%f", &students[count].marks);
 
+    if (students[count].marks < 0 || students[count].marks > 100) {
+        printf("Invalid marks! Student was not added.\n");
+        return;
+    }
+
     count++;
-    printf("\nStudent added successfully!\n");
+    printf("Student added successfully!\n");
 }
 
-void displayStudents() {
+void displayStudents(void) {
     int i;
 
     if (count == 0) {
@@ -57,78 +83,85 @@ void displayStudents() {
     }
 }
 
-void searchStudent() {
-    int roll, i;
+void searchStudent(void) {
+    int rollNo, index;
 
     printf("\nEnter Roll Number to Search: ");
-    scanf("%d", &roll);
+    scanf("%d", &rollNo);
 
-    for (i = 0; i < count; i++) {
-        if (students[i].rollNo == roll) {
-            printf("\nStudent Found!\n");
-            printf("Roll Number : %d\n", students[i].rollNo);
-            printf("Name        : %s\n", students[i].name);
-            printf("Course      : %s\n", students[i].course);
-            printf("Marks       : %.2f\n", students[i].marks);
-            return;
-        }
+    index = findStudent(rollNo);
+
+    if (index == -1) {
+        printf("Student not found.\n");
+        return;
     }
 
-    printf("\nStudent not found.\n");
+    printf("\nStudent Found!\n");
+    printf("Roll Number : %d\n", students[index].rollNo);
+    printf("Name        : %s\n", students[index].name);
+    printf("Course      : %s\n", students[index].course);
+    printf("Marks       : %.2f\n", students[index].marks);
 }
 
-void updateStudent() {
-    int roll, i;
+void updateStudent(void) {
+    int rollNo, index;
+    float marks;
 
     printf("\nEnter Roll Number to Update: ");
-    scanf("%d", &roll);
+    scanf("%d", &rollNo);
 
-    for (i = 0; i < count; i++) {
-        if (students[i].rollNo == roll) {
-            printf("Enter New Name: ");
-            scanf(" %49[^\n]", students[i].name);
+    index = findStudent(rollNo);
 
-            printf("Enter New Course: ");
-            scanf(" %29[^\n]", students[i].course);
-
-            printf("Enter New Marks: ");
-            scanf("%f", &students[i].marks);
-
-            printf("\nStudent updated successfully!\n");
-            return;
-        }
+    if (index == -1) {
+        printf("Student not found.\n");
+        return;
     }
 
-    printf("\nStudent not found.\n");
+    printf("Enter New Name: ");
+    scanf(" %49[^\n]", students[index].name);
+
+    printf("Enter New Course: ");
+    scanf(" %29[^\n]", students[index].course);
+
+    printf("Enter New Marks (0-100): ");
+    scanf("%f", &marks);
+
+    if (marks < 0 || marks > 100) {
+        printf("Invalid marks! Student details were not updated.\n");
+        return;
+    }
+
+    students[index].marks = marks;
+    printf("Student updated successfully!\n");
 }
 
-void deleteStudent() {
-    int roll, i, j;
+void deleteStudent(void) {
+    int rollNo, index, i;
 
     printf("\nEnter Roll Number to Delete: ");
-    scanf("%d", &roll);
+    scanf("%d", &rollNo);
 
-    for (i = 0; i < count; i++) {
-        if (students[i].rollNo == roll) {
-            for (j = i; j < count - 1; j++) {
-                students[j] = students[j + 1];
-            }
+    index = findStudent(rollNo);
 
-            count--;
-            printf("\nStudent deleted successfully!\n");
-            return;
-        }
+    if (index == -1) {
+        printf("Student not found.\n");
+        return;
     }
 
-    printf("\nStudent not found.\n");
+    for (i = index; i < count - 1; i++) {
+        students[i] = students[i + 1];
+    }
+
+    count--;
+    printf("Student deleted successfully!\n");
 }
 
-int main() {
+int main(void) {
     int choice;
 
     do {
         printf("\n==================================================\n");
-        printf("          STUDENT MANAGEMENT SYSTEM              \n");
+        printf("           STUDENT MANAGEMENT SYSTEM             \n");
         printf("==================================================\n");
         printf("1. Add Student\n");
         printf("2. Display Students\n");
