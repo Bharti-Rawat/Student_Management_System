@@ -1,4 +1,4 @@
-name: Deploy Student Management System
+name: Build and Deploy C Student Management System
 
 on:
   push:
@@ -21,16 +21,37 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout C source
         uses: actions/checkout@v4
+
+      - name: Install Emscripten
+        shell: bash
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk install latest
+          ./emsdk activate latest
+          source ./emsdk_env.sh
+          emcc --version
+          echo "EMSDK_ENV=$PWD/emsdk_env.sh" >> "$GITHUB_ENV"
+
+      - name: Compile original C program to WebAssembly
+        shell: bash
+        run: |
+          source "$EMSDK_ENV"
+          mkdir -p dist
+          emcc student_management.c -O2 -o dist/index.html -sEXIT_RUNTIME=1
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Upload artifact
+
+      - name: Upload compiled C application
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: './dist'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
